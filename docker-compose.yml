@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: dans
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dantcg
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 3
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    ports:
+      - "8081:8081"
+
+volumes:
+  postgres_data:
