@@ -50,6 +50,7 @@ Provision the following resources in Azure:
 ---
 
 ## 🔑 Configuration
+
 Store configuration as environment variables or in **Azure Key Vault**:
 
 - `POSTGRES_CONNECTION_STRING`  
@@ -63,15 +64,40 @@ Store configuration as environment variables or in **Azure Key Vault**:
 
 For local development, use a `.env` file (don’t commit it):
 ```
-POSTGRES_CONNECTION_STRING=...
-COSMOS_CONNECTION_STRING=...
-BLOB_STORAGE_CONNECTION_STRING=...
+POSTGRES_CONNECTION_STRING=postgres://user:pass@host:5432/db
+COSMOS_CONNECTION_STRING=AccountEndpoint=...;AccountKey=...;
+BLOB_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=...;AccountName=...;AccountKey=...;
 AZURE_AD_CLIENT_ID=...
 AZURE_AD_TENANT_ID=...
 AZURE_AD_CLIENT_SECRET=...
 EBAY_API_KEY=...
 AUSPOST_API_KEY=...
 ```
+
+---
+
+## 🧪 Test Data Seeding
+If you need test/demo data, see `/backend/tests/` for scripts or conventions. Add your own seeders as needed for local development or CI.
+
+---
+
+## 🏷️ Azure Resource Naming
+Follow these conventions for Azure resources (see also `SETUP.md`):
+
+| Resource Type         | Example Name                |
+|----------------------|----------------------------|
+| Resource Group       | `dans-tcg-rg`              |
+| App Service          | `dans-tcg-app`             |
+| Postgres DB          | `dans-tcg-pg`              |
+| CosmosDB             | `dans-tcg-cosmos`          |
+| Blob Storage         | `danstcgstorage`           |
+| Key Vault            | `dans-tcg-kv`              |
+
+---
+
+## 📖 API Documentation
+When the backend is running, access Swagger/OpenAPI docs at:  
+`http://localhost:5000/swagger`
 
 ---
 

@@ -55,11 +55,18 @@ Use clear, structured commit messages:
 
 ---
 
+
 ## 🚀 CI/CD Pipeline
 - Every PR triggers **GitHub Actions** for build + test.  
 - Code must pass linting, unit tests, and integration tests.  
+- **All PRs must pass all tests and lint checks before merge.**
 - Deployment is automatic to **staging** after merge into `develop`.  
 - Deployment to **production** is manual from `main`.  
+
+---
+
+## 📝 Onboarding
+See `ONBOARDING.md` for a step-by-step checklist for new contributors.
 
 ---
 

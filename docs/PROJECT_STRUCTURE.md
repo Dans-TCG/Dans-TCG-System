@@ -41,8 +41,9 @@ dans-tcg-system/
 
 ---
 
+
 ## Guidelines
 - **Backend**: layered architecture (API → Core → Infrastructure)
 - **Frontend**: feature-based folder structure (components grouped by feature)
-- **Docs**: all project documentation lives in `/docs/`
+- **Docs**: `/docs/` is the canonical location for all project documentation. Place all new docs here. See also `ONBOARDING.md` for new contributor steps.
 - **CI/CD**: workflows under `.github/workflows/`

@@ -114,11 +114,23 @@ _Total: ~41 weeks (≈ 10 months, solo dev pace)._
 1. Provision Azure resources (Web App, Postgres, Cosmos, Blob, Entra ID).  
 2. Scaffold .NET backend + React frontend, deploy Hello World.  
 3. Implement **Phase 1 Sprints**:  
-   - Sprint 1 → Infra & CI/CD setup  
-   - Sprint 2 → MTG Viewer (Cosmos sync + search)  
-   - Sprint 3 → Collection Manager (Postgres + Cosmos link)  
-   - Sprint 4 → Inventory Management (Postgres + eBay sync)  
+  - Sprint 1 → Infra & CI/CD setup  
+  - Sprint 2 → MTG Viewer (Cosmos sync + search)  
+  - Sprint 3 → Collection Manager (Postgres + Cosmos link)  
+  - Sprint 4 → Inventory Management (Postgres + eBay sync)  
 
 ---
 
-📖 This README serves as the **living project guide**. Update as architecture evolves, new APIs are added, or priorities shift.  
+## 📋 Onboarding
+See `ONBOARDING.md` for a step-by-step checklist for new contributors.
+
+## 🗺️ Architecture Diagram
+See `/docs/architecture-diagram.png` (or update with your own diagram) for a high-level overview of system components and data flow.
+
+## 📖 API Documentation
+When the backend is running, access Swagger/OpenAPI docs at:  
+`http://localhost:5000/swagger`
+
+---
+
+📖 This README serves as the **living project guide**. Update as architecture evolves, new APIs are added, or priorities shift.

@@ -1,0 +1,33 @@
+# Architecture Diagram – Dans TCG System
+
+> Placeholder: Add a PNG/SVG/ASCII diagram here to visualize the high-level architecture.
+
+**Recommended structure:**
+- Show backend (API/Core/Infrastructure), frontend, databases (Postgres, CosmosDB), Blob Storage, Azure resources, and integration points (eBay, AusPost, Scryfall).
+- Indicate data flows (arrows) and authentication boundaries (Azure AD/Entra ID).
+
+Example (replace with a real diagram):
+
+```
++-------------------+        +-------------------+
+|    Frontend       |<------>|    Backend API    |
+|  (React/TS)       |  REST  |  (.NET Core)      |
++-------------------+        +-------------------+
+         |                           |
+         v                           v
++-------------------+        +-------------------+
+|   Azure AD/Entra  |        |   Postgres DB     |
++-------------------+        +-------------------+
+         |                           |
+         v                           v
++-------------------+        +-------------------+
+|   CosmosDB        |        |   Blob Storage    |
++-------------------+        +-------------------+
+         |                           |
+         v                           v
++-------------------+        +-------------------+
+|  eBay API         |        |  AusPost API      |
++-------------------+        +-------------------+
+```
+
+Replace this file with a real diagram as the system evolves.
