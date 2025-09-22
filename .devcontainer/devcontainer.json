@@ -1,0 +1,25 @@
+{
+  "name": "Dans TCG Dev",
+  "dockerFile": "Dockerfile",
+
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.formatOnSave": true
+  },
+
+  "extensions": [
+    "ms-dotnettools.csharp",
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode.vscode-node-azure-pack",
+    "ms-ossdata.vscode-postgresql",
+    "mongodb.mongodb-vscode",
+    "dbaeumer.vscode-eslint"
+  ],
+
+  "postCreateCommand": "dotnet restore backend && npm install --prefix frontend",
+
+  "forwardPorts": [5000, 3000],
+
+  "remoteUser": "vscode"
+}
