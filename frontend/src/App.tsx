@@ -61,7 +61,7 @@ const Home = () => {
       <AuthenticatedTemplate>
         <p>Signed in.</p>
         <button onClick={callApi}>Call API (/health/db)</button>
-  <button onClick={callSecure}>Call Protected API (/api/secure/ping)</button>
+        <button onClick={callSecure}>Call Protected API (/api/secure/ping)</button>
         <button onClick={logout}>Logout</button>
       </AuthenticatedTemplate>
       <UnauthenticatedTemplate>
