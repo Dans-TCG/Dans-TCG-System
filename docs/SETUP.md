@@ -7,7 +7,7 @@ This guide explains how to set up a development environment for the Dans TCG Sys
 ## 📥 Prerequisites
 Make sure you have the following installed locally (if not using GitHub Codespaces):
 - [Git](https://git-scm.com/)  
-- [.NET 7 SDK](https://dotnet.microsoft.com/download)  
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)  
 - [Node.js (LTS)](https://nodejs.org/) + npm or yarn  
 - [PostgreSQL](https://www.postgresql.org/) (local or Azure)  
 - [Docker](https://www.docker.com/) (optional for local DBs)  
@@ -62,9 +62,9 @@ Store configuration as environment variables or in **Azure Key Vault**:
 - `EBAY_API_KEY`  
 - `AUSPOST_API_KEY`  
 
-For local development, use a `.env` file (don’t commit it):
+For local development, copy `.env.sample` to `.env` and adjust values (don’t commit it):
 ```
-POSTGRES_CONNECTION_STRING=postgres://user:pass@host:5432/db
+POSTGRES_CONNECTION_STRING=Host=localhost;Port=5432;Username=dans;Password=password;Database=dantcg
 COSMOS_CONNECTION_STRING=AccountEndpoint=...;AccountKey=...;
 BLOB_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=...;AccountName=...;AccountKey=...;
 AZURE_AD_CLIENT_ID=...
@@ -97,7 +97,7 @@ Follow these conventions for Azure resources (see also `SETUP.md`):
 
 ## 📖 API Documentation
 When the backend is running, access Swagger/OpenAPI docs at:  
-`http://localhost:5000/swagger`
+`http://localhost:8080/swagger`
 
 ---
 
@@ -107,9 +107,11 @@ cd backend
 dotnet restore
 dotnet run
 ```
-Backend runs on: `http://localhost:5000`
+Backend runs on: `http://localhost:8080`
 
-Swagger API docs: `http://localhost:5000/swagger`
+Swagger API docs: `http://localhost:8080/swagger`
+
+To run with a specific port, set `ASPNETCORE_URLS=http://localhost:8080` in your environment or `.env`.
 
 ---
 
@@ -120,6 +122,20 @@ npm install
 npm start
 ```
 Frontend runs on: `http://localhost:3000`
+
+---
+
+## 🐘 Local PostgreSQL Options
+
+- Recommended: Use the included `docker-compose.yml` service named `postgres` (port 5432). The matching connection string is in `.env.sample`.
+- If Docker is not available, install PostgreSQL locally and create a database/user that match the values in `.env.sample` or adjust the connection string accordingly.
+
+### Applying EF Core migrations
+
+If you can't reach a running Postgres instance yet, you can still generate an idempotent SQL script:
+
+1. From `backend/DansTCG.API`, generate the script (already created during setup as `backend/DansTCG.Infrastructure/migrations.sql`).
+2. Once Postgres is running, execute that SQL in your DB via your preferred client.
 
 ---
 

@@ -1,0 +1,78 @@
+name: frontend-deploy-swa
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy-swa.yml'
+  workflow_dispatch:
+
+env:
+  APP_LOCATION: frontend
+  OUTPUT_LOCATION: frontend/dist
+
+permissions:
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci || npm install
+
+      - name: Generate .env.production from repo variables
+        working-directory: frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${{ vars.VITE_AZURE_AD_CLIENT_ID }}"
+          : "${{ vars.VITE_AZURE_AD_TENANT_ID }}"
+          : "${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}"
+          : "${{ vars.VITE_API_BASE }}"
+          if [ -z "${{ vars.VITE_AZURE_AD_CLIENT_ID }}" ] || [ -z "${{ vars.VITE_AZURE_AD_TENANT_ID }}" ] || [ -z "${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}" ] || [ -z "${{ vars.VITE_API_BASE }}" ]; then
+            echo "::error::One or more required frontend variables are missing. Please set repository variables: VITE_AZURE_AD_CLIENT_ID, VITE_AZURE_AD_TENANT_ID, VITE_AZURE_AD_BACKEND_CLIENT_ID, VITE_API_BASE";
+            exit 1;
+          fi
+          # Enforce HTTPS and custom domain usage to avoid accidental azurewebsites.net
+          if [[ "${{ vars.VITE_API_BASE }}" != https://* ]]; then
+            echo "::error::VITE_API_BASE must start with https://"; exit 1;
+          fi
+          if echo "${{ vars.VITE_API_BASE }}" | grep -qi 'azurewebsites\.net'; then
+            echo "::error::VITE_API_BASE points to azurewebsites.net. Set it to your custom API domain."; exit 1;
+          fi
+          cat > .env.production <<EOF
+          VITE_AZURE_AD_CLIENT_ID=${{ vars.VITE_AZURE_AD_CLIENT_ID }}
+          VITE_AZURE_AD_TENANT_ID=${{ vars.VITE_AZURE_AD_TENANT_ID }}
+          VITE_AZURE_AD_BACKEND_CLIENT_ID=${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}
+          VITE_API_BASE=${{ vars.VITE_API_BASE }}
+          EOF
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: ${{ env.APP_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}

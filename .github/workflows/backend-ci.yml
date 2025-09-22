@@ -1,0 +1,55 @@
+name: backend-ci
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build_test_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore backend/DansTCG.API/DansTCG.API.csproj
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release backend/DansTCG.API/DansTCG.API.csproj
+
+      - name: Run tests (if any)
+        shell: bash
+        run: |
+          set -e
+          projects=$(git ls-files 'backend/**/*Tests.csproj' || true)
+          if [ -n "$projects" ]; then
+            echo "Found test projects:\n$projects"
+            dotnet test --no-build --configuration Release $projects
+          else
+            echo "No test projects found under backend/. Skipping tests."
+          fi
+
+      - name: Publish artifact
+        run: dotnet publish backend/DansTCG.API/DansTCG.API.csproj -c Release -o backend-publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-publish
+          path: backend-publish
