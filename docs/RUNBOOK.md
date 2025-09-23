@@ -21,7 +21,7 @@ This document provides operational runbooks for maintenance, monitoring, and rec
 Restore procedure:
 1. Identify backup timestamp in Azure portal
 2. Restore DB to new instance
-3. Update connection strings in App Service (staging)
+3. Update connection strings in App Service
 4. Validate before promoting to production
 
 ---
@@ -29,7 +29,7 @@ Restore procedure:
 ## 🚨 Incident Response
 1. **Critical outage (API down)**  
    - Check Azure App Service logs  
-   - Roll back to last stable deployment (swap staging → prod)  
+   - Roll back to last stable deployment by re-deploying the previous successful artifact/run from GitHub Actions  
    - Notify stakeholders  
 
 2. **Database outage**  
@@ -49,8 +49,8 @@ Restore procedure:
 ---
 
 ## 🔄 Deployment
-- PR merged into `develop` → auto deploy to **staging**
-- Manual approval required for **staging → production**
+- PR merged into `main` → auto deploy to production (App Service)
+- Frontend auto deploys to Static Web Apps on push to `main`
 - Rollback = re-deploy last successful build from GitHub Actions artifacts
 
 ---

@@ -15,7 +15,6 @@ A reference for domain-specific terms and acronyms used in this project.
 - **CosmosDB (Mongo API)**: Azure-hosted NoSQL database for card metadata/prices
 - **Blob Storage**: Azure object storage for images, PDFs, backups
 - **CI/CD**: Continuous Integration/Continuous Deployment (GitHub Actions)
-- **Staging Slot**: Azure Web App deployment slot for pre-production testing
 - **Production Slot**: Azure Web App live/production environment
 - **DTO**: Data Transfer Object (used in API communication)
 - **Trade Magic**: Manual marketplace integration (not automated)

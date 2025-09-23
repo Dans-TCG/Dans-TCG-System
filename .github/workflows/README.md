@@ -1,6 +1,6 @@
 # GitHub Workflows – CI/CD Guide
 
-This repo includes separate workflows for backend CI, frontend CI, backend production deploy, backend staging deploy/swap, and frontend deploy.
+This repo includes separate workflows for backend CI, frontend CI, backend production deploy, and frontend deploy.
 
 ## Workflows
 
@@ -19,11 +19,7 @@ This repo includes separate workflows for backend CI, frontend CI, backend produ
 	- Triggers: push to `main` affecting backend or this workflow
 	- Parameterized with repo variable: `BACKEND_APP_NAME` (fallback: `danstcg-webapp`)
 
-- backend-deploy-staging.yml
-	- Purpose: Build the backend API, deploy to App Service `staging` slot, then swap to production
-	- Triggers: push to `main` or manual dispatch
-	- Uses Environments: `staging` (deploy), `production` (swap)
-	- Parameterized with repo variables: `BACKEND_APP_NAME` (fallback: `danstcg-webapp`), `RESOURCE_GROUP` (fallback: `danstcg-rg`)
+Note: We no longer use an App Service staging slot to avoid extra cost. Deployments go directly to production.
 
 - frontend-deploy-swa.yml
 	- Purpose: Build and deploy the frontend to Azure Static Web Apps
@@ -71,20 +67,13 @@ Where to get values:
 For Static Web Apps deploy:
 - `AZURE_STATIC_WEB_APPS_API_TOKEN` – Deployment token from your Static Web App (Azure Portal → Static Web Apps → Deployment tokens)
 
-## Environments and approvals (recommended)
+## Environments and approvals (optional)
 
-Set up two environments in GitHub (Settings → Environments):
-
-- `staging`
-	- Optional required reviewers before deploy (backend-deploy-staging deploy job targets this env)
-
-- `production`
-	- Add required reviewers to approve the slot swap step (backend-deploy-staging swap job targets this env)
+If you still want deployment approvals, you can configure a `production` environment in GitHub (Settings → Environments) and require reviewers for the backend deploy workflow.
 
 ## Notes
 
 - The backend deploy workflows publish only `backend/DansTCG.API` and deploy that artifact.
-- The staging flow auto-creates the `staging` slot if it does not exist and warms it up.
 - Frontend deploy uses Azure Static Web Apps action; ensure the token secret is added.
 - If you prefer deploying frontend to App Service instead of SWA, create an alternate workflow using `azure/webapps-deploy@v3` and deploy the `frontend/dist` folder to the appropriate site.
 

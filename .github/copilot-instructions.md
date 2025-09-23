@@ -15,7 +15,7 @@ Dans TCG System is a full-stack platform for managing and selling Magic: The Gat
   - **CosmosDB (Mongo API):** MTG card metadata, prices  
   - **Azure Blob Storage:** Card images, invoices, shipping labels, backups (organized into containers)  
 - **Authentication:** Microsoft Entra ID (Azure AD)  
-- **CI/CD:** GitHub Actions, deploys to Azure App Service (API, staging slot → production slot) and Azure Static Web Apps (frontend)
+- **CI/CD:** GitHub Actions, deploys to Azure App Service (API, direct to production) and Azure Static Web Apps (frontend)
 
 ## Key Workflows
 - **Backend:**  
@@ -31,7 +31,7 @@ Dans TCG System is a full-stack platform for managing and selling Magic: The Gat
   - Production: Azure Key Vault, surfaced via App Service references (`@Microsoft.KeyVault(...)`)  
 - **Deployment:**  
   - Push/PR to `main` triggers CI/CD via GitHub Actions  
-  - Backend API → Azure App Service staging slot, then swap to production  
+  - Backend API → Azure App Service (production)  
   - Frontend → Azure Static Web Apps
 
 ## Conventions & Patterns

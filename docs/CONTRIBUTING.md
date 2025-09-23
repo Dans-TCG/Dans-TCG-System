@@ -60,8 +60,7 @@ Use clear, structured commit messages:
 - Every PR triggers **GitHub Actions** for build + test.  
 - Code must pass linting, unit tests, and integration tests.  
 - **All PRs must pass all tests and lint checks before merge.**
-- Deployment is automatic to **staging** after merge into `develop`.  
-- Deployment to **production** is manual from `main`.  
+- Deployment to **production** is automatic from `main` (App Service for backend, SWA for frontend).  
 
 ---
 

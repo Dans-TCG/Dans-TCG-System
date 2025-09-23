@@ -161,8 +161,8 @@ npm test
 
 ## 🚀 Deployment
 1. Push changes to GitHub → triggers **GitHub Actions** CI/CD.  
-2. Deploys automatically to **staging slot** in Azure Web App.  
-3. Manual promotion from **staging → production**.  
+2. Backend API deploys automatically to the Azure App Service production slot.  
+3. Frontend deploys to Azure Static Web Apps.  
 
 ---
 

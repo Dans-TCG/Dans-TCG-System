@@ -33,8 +33,7 @@ The system integrates with **eBay, MTGJSON/Scryfall, and AusPost**, with manual 
   - Microsoft Entra ID tenant + app registrations  
 
 - **CI/CD:**  
-  - GitHub Actions pipeline  
-  - Deploy to staging slot → manual promotion to production  
+  - GitHub Actions pipeline (direct deploy to production)  
 
 - **Secrets/Config:**  
   - Store API keys (eBay, AusPost) in **Azure Key Vault** or GitHub Secrets  
