@@ -11,6 +11,10 @@ on:
       - ".github/workflows/main_danstcg-webapp.yml"
   workflow_dispatch:
 
+env:
+  APP_NAME: ${{ vars.BACKEND_APP_NAME || 'danstcg-webapp' }}
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP || 'danstcg-rg' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -70,6 +74,15 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Resolve production hostname
+        id: resolve-host
+        shell: bash
+        run: |
+          set -e
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$APP_NAME" --query defaultHostName -o tsv)
+          if [ -z "$HOST" ]; then echo "::error::Could not resolve defaultHostName for $APP_NAME in $RESOURCE_GROUP"; exit 1; fi
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -81,9 +94,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          APP_NAME=${{ vars.BACKEND_APP_NAME || 'danstcg-webapp' }}
+          HOST="${{ steps.resolve-host.outputs.host }}"
           for i in {1..10}; do
-            if curl -fsS "https://${APP_NAME}.azurewebsites.net/health/db" | grep -q '"db":"ok"'; then
+            if curl -fsS "https://${HOST}/health/db" | grep -q '"db":"ok"'; then
               echo "Production health ok"; exit 0;
             fi
             echo "Prod health not ready yet, retry $i/10..."; sleep 5;

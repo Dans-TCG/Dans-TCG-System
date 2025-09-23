@@ -72,6 +72,15 @@ jobs:
             echo "Staging slot already exists."
           fi
 
+      - name: Resolve staging hostname
+        id: resolve-staging
+        shell: bash
+        run: |
+          set -e
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$APP_NAME" --slot staging --query defaultHostName -o tsv)
+          if [ -z "$HOST" ]; then echo "::error::Could not resolve staging defaultHostName"; exit 1; fi
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to staging slot
         uses: azure/webapps-deploy@v3
         with:
@@ -84,9 +93,8 @@ jobs:
         run: |
           set -e
           echo "Warming up staging slot..."
-          # Replace with your staging hostname if custom domain in use
           for i in {1..10}; do
-            if curl -fsS "https://${APP_NAME}-staging.azurewebsites.net/health/db" | grep -q '"db":"ok"'; then
+            if curl -fsS "https://${{ steps.resolve-staging.outputs.host }}/health/db" | grep -q '"db":"ok"'; then
               echo "Staging health ok"; exit 0;
             fi
             echo "Health not ready yet, retry $i/10..."; sleep 5;
@@ -112,8 +120,10 @@ jobs:
         shell: bash
         run: |
           set -e
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$APP_NAME" --query defaultHostName -o tsv)
+          if [ -z "$HOST" ]; then echo "::error::Could not resolve production defaultHostName"; exit 1; fi
           for i in {1..10}; do
-            if curl -fsS "https://${APP_NAME}.azurewebsites.net/health/db" | grep -q '"db":"ok"'; then
+            if curl -fsS "https://${HOST}/health/db" | grep -q '"db":"ok"'; then
               echo "Production health ok"; exit 0;
             fi
             echo "Prod health not ready yet, retry $i/10..."; sleep 5;
