@@ -1,0 +1,140 @@
+name: custom-domain-setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_hostname:
+        description: "Custom domain for API (e.g., api.danstcg.com)"
+        required: true
+        type: string
+      frontend_hostname:
+        description: "Custom domain for Frontend SWA (e.g., danstcg.com or www.danstcg.com)"
+        required: true
+        type: string
+      frontend_origins:
+        description: "Comma-separated list of frontend origins for CORS (e.g., https://danstcg.com,https://www.danstcg.com)"
+        required: false
+        default: "https://danstcg.com,https://www.danstcg.com"
+        type: string
+      swa_name:
+        description: "Azure Static Web App name (resource name)"
+        required: true
+        type: string
+      swa_resource_group:
+        description: "Resource group that contains the Static Web App"
+        required: true
+        type: string
+      app_name:
+        description: "Azure App Service name for API"
+        required: false
+        default: "danstcg-webapp"
+        type: string
+      resource_group:
+        description: "Azure Resource Group for the App Service"
+        required: false
+        default: "danstcg-rg"
+        type: string
+      frontend_app_client_id:
+        description: "Frontend Entra App (client) ID for redirect URIs"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  setup-custom-domains:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure Azure CLI extension for Static Web Apps
+        shell: bash
+        run: |
+          set -euo pipefail
+          az extension add --name staticwebapp --yes || az extension update --name staticwebapp || true
+
+      - name: Map API custom hostname to App Service
+        shell: bash
+        run: |
+          set -euo pipefail
+          RG="${{ inputs.resource_group }}"
+          APP="${{ inputs.app_name }}"
+          HOST="${{ inputs.api_hostname }}"
+          echo "Checking if hostname $HOST already exists..."
+          if az webapp config hostname list -g "$RG" -n "$APP" --query "[?name=='$HOST']" -o tsv | grep -q "$HOST"; then
+            echo "Hostname already configured."
+          else
+            echo "Adding hostname $HOST to webapp $APP in $RG..."
+            az webapp config hostname add -g "$RG" -n "$APP" --hostname "$HOST"
+          fi
+          echo "Hostname added (DNS must point to App Service before binding SSL)."
+
+      - name: Create Managed Certificate for API hostname
+        shell: bash
+        run: |
+          set -euo pipefail
+          RG="${{ inputs.resource_group }}"
+          APP="${{ inputs.app_name }}"
+          HOST="${{ inputs.api_hostname }}"
+          echo "Attempting to create managed cert for $HOST (will be no-op if exists)..."
+          az webapp config ssl create -g "$RG" -n "$APP" --hostname "$HOST" || true
+          echo "Listing certs to locate thumbprint..."
+          THUMB=$(az webapp config ssl list -g "$RG" --query "[?contains(hostNames, '$HOST')].thumbprint | [0]" -o tsv)
+          if [ -z "$THUMB" ]; then echo "::error::Could not locate certificate thumbprint for $HOST"; exit 1; fi
+          echo "Found cert thumbprint: $THUMB"
+          echo "Binding cert to hostname..."
+          # Bind may fail if already bound; make idempotent
+          az webapp config ssl bind -g "$RG" -n "$APP" --certificate-thumbprint "$THUMB" --ssl-type SNI || true
+          echo "SSL binding complete."
+
+      - name: Set API CORS origins from inputs.frontend_origins
+        shell: bash
+        run: |
+          set -euo pipefail
+          RG="${{ inputs.resource_group }}"
+          APP="${{ inputs.app_name }}"
+          ORIGINS="${{ inputs.frontend_origins }}"
+          echo "Setting FRONTEND_URLS=$ORIGINS on $APP..."
+          az webapp config appsettings set -g "$RG" -n "$APP" --settings FRONTEND_URLS="$ORIGINS"
+          echo "App setting applied."
+
+      - name: Configure SWA custom domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          SWA_RG="${{ inputs.swa_resource_group }}"
+          SWA_NAME="${{ inputs.swa_name }}"
+          HOST="${{ inputs.frontend_hostname }}"
+          echo "Setting SWA hostname $HOST on $SWA_NAME in $SWA_RG..."
+          az staticwebapp hostname set -g "$SWA_RG" -n "$SWA_NAME" --hostname "$HOST" || true
+          echo "If validation is pending, ensure your DNS CNAME/TXT records are set as instructed by Azure."
+          echo "Current hostname status:"
+          az staticwebapp hostname list -g "$SWA_RG" -n "$SWA_NAME" -o table || true
+
+      - name: Update Entra App (SPA) Redirect URIs
+        if: ${{ inputs.frontend_app_client_id != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_ID="${{ inputs.frontend_app_client_id }}"
+          HOST="${{ inputs.frontend_hostname }}"
+          # Include both root and www variant if applicable
+          URIS=("https://$HOST")
+          if [[ "$HOST" != www.* ]]; then
+            URIS+=("https://www.${HOST}")
+          fi
+          echo "Updating SPA redirect URIs for appId=$APP_ID: ${URIS[*]}"
+          # Make non-blocking in case principal lacks permissions
+          az ad app update --id "$APP_ID" --spa-redirect-uris ${URIS[*]} || echo "Warning: Could not update SPA redirect URIs; ensure the Azure principal has permissions or update in portal."
+          echo "Note: Logout URL for SPA is optional; if needed, configure in portal under Authentication."
