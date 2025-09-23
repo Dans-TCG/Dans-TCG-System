@@ -9,7 +9,7 @@ namespace DansTCG.API.Controllers
     public class SecureController : ControllerBase
     {
         [HttpGet("ping")]
-        [Authorize]
+        [Authorize(Policy = "ApiScope")]
         public IActionResult Ping()
         {
             var name = User.Identity?.Name ?? "unknown";

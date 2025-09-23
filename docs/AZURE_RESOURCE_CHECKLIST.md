@@ -12,6 +12,7 @@ Use this checklist to verify and document your Azure infrastructure setup.
 - [ ] App Service: `danstcg-webapp`
 - [ ] App Service Plan: `danstcg-plan`
 - [ ] Managed Identity: `danstcg-webapp-id-b366`
+- [ ] Static Web Apps (Frontend): `danstcg-swa`
 - [ ] Azure Database for PostgreSQL: `danstcg-postgres`
 - [ ] Cosmos DB for MongoDB: `danstcg-cosmos`
 - [ ] Storage Account: `danstcgstorage`
@@ -42,6 +43,12 @@ Use this checklist to verify and document your Azure infrastructure setup.
 ## 6. App Service Configuration
 - [ ] App Service references Key Vault secrets using `@Microsoft.KeyVault(...)`
 - [ ] Application Insights instrumentation key set
+- [ ] CORS allowed origins set via `FRONTEND_URLS` to include `https://danstcg.com,https://www.danstcg.com`
+- [ ] Custom domain bound for API (e.g., `api.danstcg.com`) with TLS certificate
+
+## 6b. Static Web Apps Configuration
+- [ ] Custom domains added (e.g., `danstcg.com`, `www.danstcg.com`) and SSL certificates issued
+- [ ] Routing/security via `staticwebapp.config.json` deployed
 
 ## 7. Entra ID (Azure AD) App Registrations
 - [ ] Backend app registration created

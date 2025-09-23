@@ -11,7 +11,7 @@ const Home = () => {
   const { instance, accounts } = useMsal();
 
   const login = async () => {
-    await instance.loginPopup({ scopes: ["User.Read"] });
+    await instance.loginPopup({ scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/access_as_user"] });
   };
   const logout = () => instance.logoutPopup();
 
@@ -20,10 +20,10 @@ const Home = () => {
       const account = accounts[0];
       const token = await instance.acquireTokenSilent({
         account,
-        scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/.default"]
+        scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/access_as_user"]
       }).catch(async (e: unknown) => {
         if (e instanceof InteractionRequiredAuthError) {
-          const res = await instance.acquireTokenPopup({ scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/.default"] });
+          const res = await instance.acquireTokenPopup({ scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/access_as_user"] });
           return res;
         }
         throw e;
@@ -43,7 +43,7 @@ const Home = () => {
       const account = accounts[0];
       const token = await instance.acquireTokenSilent({
         account,
-        scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/.default"]
+        scopes: ["api://" + import.meta.env.VITE_AZURE_AD_BACKEND_CLIENT_ID + "/access_as_user"]
       });
       const resp = await axios.get(`${apiBase}/api/secure/ping`, {
         headers: { Authorization: `Bearer ${token.accessToken}` }

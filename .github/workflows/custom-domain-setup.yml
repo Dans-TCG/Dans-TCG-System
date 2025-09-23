@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       api_hostname:
-        description: "Custom domain for API (e.g., api.danstcg.com.au)"
+  description: "Custom domain for API (e.g., api.danstcg.com)"
         required: true
         type: string
       frontend_hostname:
-        description: "Custom domain for Frontend SWA (e.g., danstcg.com.au or www.danstcg.com.au)"
+  description: "Custom domain for Frontend SWA (e.g., danstcg.com or www.danstcg.com)"
         required: true
         type: string
       frontend_origins:
-        description: "Comma-separated list of frontend origins for CORS (e.g., https://danstcg.com.au,https://www.danstcg.com.au)"
+  description: "Comma-separated list of frontend origins for CORS (e.g., https://danstcg.com,https://www.danstcg.com)"
         required: false
-        default: "https://danstcg.com.au,https://www.danstcg.com.au"
+  default: "https://danstcg.com,https://www.danstcg.com"
         type: string
       swa_name:
         description: "Azure Static Web App name (resource name)"

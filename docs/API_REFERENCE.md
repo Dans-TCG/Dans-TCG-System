@@ -6,8 +6,8 @@ All endpoints are secured with **Microsoft Entra ID (Azure AD)** using OAuth2 / 
 
 **Note:** API versioning is not currently implemented, but may be introduced in the future. If versioning is added, endpoints will follow the `/api/v{n}/...` pattern.
 
-Base URL (local): `http://localhost:5000/api`  
-Base URL (prod): `https://<yourapp>.azurewebsites.net/api`
+Base URL (local): `http://localhost:8080/api`  
+Base URL (prod): `https://api.danstcg.com/api`
 
 ---
 

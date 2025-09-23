@@ -6,7 +6,7 @@ Follow these steps to get started as a new contributor:
 
 ## 1. Prerequisites
 - Install [Git](https://git-scm.com/)
-- Install [.NET 7 SDK](https://dotnet.microsoft.com/download)
+- Install [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - Install [Node.js (LTS)](https://nodejs.org/) + npm or yarn
 - Install [PostgreSQL](https://www.postgresql.org/) (local or Azure)
 - (Optional) Install [Docker](https://www.docker.com/) for local DBs
@@ -62,7 +62,7 @@ cd dans-tcg-system
   ```
 
 ## 8. Explore API Docs
-- Visit `http://localhost:5000/swagger` for Swagger/OpenAPI documentation
+- Visit `http://localhost:8080/swagger` for Swagger/OpenAPI documentation
 
 ## 9. Review Project Structure & Docs
 - See `PROJECT_STRUCTURE.md` and `/docs/` for architecture, data models, and workflows

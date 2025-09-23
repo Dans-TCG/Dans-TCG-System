@@ -34,6 +34,20 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
+// Authorization policy: require the API scope "access_as_user" on protected endpoints
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireAssertion(ctx =>
+            ctx.User.HasClaim(c => c.Type == "scp" &&
+                                  (c.Value ?? string.Empty)
+                                      .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                      .Contains("access_as_user")));
+    });
+});
+
 // Auth (Microsoft Entra ID) - expects AZURE_AD_TENANT_ID and AZURE_AD_CLIENT_ID
 var tenantId = builder.Configuration["AZURE_AD_TENANT_ID"] ?? Environment.GetEnvironmentVariable("AZURE_AD_TENANT_ID");
 var clientId = builder.Configuration["AZURE_AD_CLIENT_ID"] ?? Environment.GetEnvironmentVariable("AZURE_AD_CLIENT_ID");

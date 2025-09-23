@@ -17,14 +17,15 @@ The system integrates with **eBay, MTGJSON/Scryfall, and AusPost**, with manual 
 - **Azure Blob Storage** → card images, invoices, shipping labels, backups  
 
 **Authentication:** Microsoft Entra ID (Azure AD)  
-**Hosting:** Azure Web App (App Service)  
+**Hosting:** Frontend on Azure Static Web Apps (SWA), Backend API on Azure App Service  
 **Dev Environment:** GitHub Codespaces + GitHub Actions (CI/CD)  
 
 ---
 
 ## 🏗️ Infrastructure Setup
 - **Azure Resources Required:**  
-  - Web App (App Service)  
+  - App Service (Backend API)  
+  - Static Web Apps (Frontend)  
   - Database for PostgreSQL  
   - CosmosDB (Mongo API)  
   - Blob Storage  
@@ -129,7 +130,7 @@ See `/docs/architecture-diagram.png` (or update with your own diagram) for a hig
 
 ## 📖 API Documentation
 When the backend is running, access Swagger/OpenAPI docs at:  
-`http://localhost:5000/swagger`
+`http://localhost:8080/swagger`
 
 ---
 

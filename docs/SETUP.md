@@ -29,8 +29,11 @@ cd dans-tcg-system
 
 ## ⚙️ Infrastructure Setup (Azure)
 Provision the following resources in Azure:
-1. **Azure Web App (App Service)**  
-   - Hosts the .NET backend API and React frontend  
+1. **Azure App Service (Backend API)**  
+   - Hosts the .NET backend API  
+   
+1b. **Azure Static Web Apps (Frontend)**  
+   - Hosts the React SPA (production)
 
 2. **Azure Database for PostgreSQL**  
    - Business data (collection, inventory, orders, CRM, finance, tax)  
@@ -122,6 +125,8 @@ npm install
 npm start
 ```
 Frontend runs on: `http://localhost:3000`
+
+For production, the frontend is deployed to Azure Static Web Apps (e.g., `https://danstcg.com` / `https://www.danstcg.com`) and the API base should point to the custom domain on App Service (e.g., `https://api.danstcg.com`).
 
 ---
 

@@ -33,7 +33,7 @@ This repo includes separate workflows for backend CI, frontend CI, backend produ
 		- `VITE_AZURE_AD_CLIENT_ID`
 		- `VITE_AZURE_AD_TENANT_ID`
 		- `VITE_AZURE_AD_BACKEND_CLIENT_ID`
-		- `VITE_API_BASE` (e.g., `https://<your-api-app>.azurewebsites.net`)
+		- `VITE_API_BASE` (e.g., `https://api.danstcg.com`)
 
 ## Required repository Variables (Settings → Secrets and variables → Actions → Variables)
 
@@ -44,11 +44,11 @@ For Frontend (used by frontend-deploy-swa.yml to generate .env.production):
 - `VITE_AZURE_AD_CLIENT_ID`
 - `VITE_AZURE_AD_TENANT_ID`
 - `VITE_AZURE_AD_BACKEND_CLIENT_ID`
-- `VITE_API_BASE` (e.g., `https://<your-api-app>.azurewebsites.net`)
+- `VITE_API_BASE` (e.g., `https://api.danstcg.com`)
 
 Optional but recommended (CORS):
 - `FRONTEND_URL` (e.g., `https://<your-frontend-host>`) for a single origin, or
-- `FRONTEND_URLS` (comma-separated) for multiple origins, e.g., `https://www.danstcg.com.au,https://app.danstcg.com.au`
+- `FRONTEND_URLS` (comma-separated) for multiple origins, e.g., `https://www.danstcg.com,https://app.danstcg.com`
 	- These are App Service application settings read by the API to allow browser calls from your frontend domains.
 
 ## Required repository Secrets (Settings → Secrets and variables → Actions → Secrets)

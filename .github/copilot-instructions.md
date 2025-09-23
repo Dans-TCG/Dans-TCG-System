@@ -15,7 +15,7 @@ Dans TCG System is a full-stack platform for managing and selling Magic: The Gat
   - **CosmosDB (Mongo API):** MTG card metadata, prices  
   - **Azure Blob Storage:** Card images, invoices, shipping labels, backups (organized into containers)  
 - **Authentication:** Microsoft Entra ID (Azure AD)  
-- **CI/CD:** GitHub Actions, deploys to Azure Web App (staging slot → production slot)
+- **CI/CD:** GitHub Actions, deploys to Azure App Service (API, staging slot → production slot) and Azure Static Web Apps (frontend)
 
 ## Key Workflows
 - **Backend:**  
@@ -30,8 +30,9 @@ Dans TCG System is a full-stack platform for managing and selling Magic: The Gat
   - Codespaces: secrets injected automatically from GitHub Codespaces config  
   - Production: Azure Key Vault, surfaced via App Service references (`@Microsoft.KeyVault(...)`)  
 - **Deployment:**  
-  - Push/PR to `main` triggers CI/CD via GitHub Actions → deploys to Azure Web App staging slot  
-  - Promotion to production = slot swap (staging → production)  
+  - Push/PR to `main` triggers CI/CD via GitHub Actions  
+  - Backend API → Azure App Service staging slot, then swap to production  
+  - Frontend → Azure Static Web Apps
 
 ## Conventions & Patterns
 - **Branching:**  
@@ -78,7 +79,7 @@ Dans TCG System is a full-stack platform for managing and selling Magic: The Gat
 - **Glossary:** See `GLOSSARY.md` for domain-specific terms and acronyms.
 - **Architecture Diagram:** See `/docs/architecture-diagram.txt` (replace with PNG/SVG as available) for a high-level system overview.
 - **Test Data Seeding:** See `SETUP.md` and `/backend/tests/` for test/demo data scripts or conventions.
-- **API Docs:** Available at `http://localhost:5000/swagger` when backend is running.
+- **API Docs:** Available at `http://localhost:8080/swagger` when backend is running.
 - **API Versioning:** Not currently implemented, but may be added (see `API_REFERENCE.md`).
 - **Error Logging:** All errors and logs are sent to Application Insights; see `RUNBOOK.md` for monitoring and troubleshooting.
 - **REST Pattern:** Use REST APIs only for frontend-backend communication (see `API_REFERENCE.md`).
