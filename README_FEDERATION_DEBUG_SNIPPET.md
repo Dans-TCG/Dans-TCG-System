@@ -1,4 +1,4 @@
-Federated Identity Debug Quick Reference
+Federated Identity Debug Quick Reference (sweep test edit)
 ========================================
 
 GitHub Actions OIDC Subject Patterns
@@ -31,3 +31,21 @@ Troubleshooting Steps
 Script Automation
 -----------------
 Use `scripts/azure/diagnose_federation.sh` for automated validation and (optionally) creation.
+# 1. List static web apps you have in the subscription
+az staticwebapp list -o table
+
+# 2. Show details of the target (replace placeholders)
+az staticwebapp show -n <SWA_NAME> -g <RESOURCE_GROUP>
+
+# 3. List current deployment token (apiKey)
+az staticwebapp secrets list -n <SWA_NAME> -g <RESOURCE_GROUP> -o json
+
+# Output example:
+# {
+#   "properties": {
+#     "apiKey": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+#   }
+# }
+
+# 4. (Optional) Reset/rotate the token (this invalidates the old one)
+az staticwebapp secrets reset -n <SWA_NAME> -g <RESOURCE_GROUP> -o json

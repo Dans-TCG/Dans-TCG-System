@@ -80,7 +80,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 function App() {
-  // No-op change to trigger SWA deploy (token verification run).
+  // Trigger sweep test: frontend change for SWA deploy validation.
   return (
     <Router>
       <Routes>

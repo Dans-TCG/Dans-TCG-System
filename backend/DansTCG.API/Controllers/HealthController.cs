@@ -6,7 +6,7 @@ namespace DansTCG.API.Controllers
     [Route("api/[controller]")]
     public class HealthController : ControllerBase
     {
-        // Trivial comment change to trigger CI/CD deploy workflow.
+    // Trigger sweep test: backend change for CI/CD validation.
         [HttpGet]
         public IActionResult Get() => Ok(new { status = "Healthy" });
     }
