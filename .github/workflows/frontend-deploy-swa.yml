@@ -1,5 +1,9 @@
 name: frontend-deploy-swa
 
+concurrency:
+  group: frontend-deploy-swa
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main ]
@@ -27,6 +31,14 @@ jobs:
         with:
           node-version: '18.x'
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Install dependencies
         working-directory: frontend
         run: npm ci || npm install
@@ -34,28 +46,28 @@ jobs:
       - name: Generate .env.production from repo variables
         working-directory: frontend
         shell: bash
+        env:
+          VITE_AZURE_AD_CLIENT_ID: ${{ vars.VITE_AZURE_AD_CLIENT_ID }}
+          VITE_AZURE_AD_TENANT_ID: ${{ vars.VITE_AZURE_AD_TENANT_ID }}
+          VITE_AZURE_AD_BACKEND_CLIENT_ID: ${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
         run: |
           set -euo pipefail
-          : "${{ vars.VITE_AZURE_AD_CLIENT_ID }}"
-          : "${{ vars.VITE_AZURE_AD_TENANT_ID }}"
-          : "${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}"
-          : "${{ vars.VITE_API_BASE }}"
-          if [ -z "${{ vars.VITE_AZURE_AD_CLIENT_ID }}" ] || [ -z "${{ vars.VITE_AZURE_AD_TENANT_ID }}" ] || [ -z "${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}" ] || [ -z "${{ vars.VITE_API_BASE }}" ]; then
+          if [ -z "${VITE_AZURE_AD_CLIENT_ID}" ] || [ -z "${VITE_AZURE_AD_TENANT_ID}" ] || [ -z "${VITE_AZURE_AD_BACKEND_CLIENT_ID}" ] || [ -z "${VITE_API_BASE}" ]; then
             echo "::error::One or more required frontend variables are missing. Please set repository variables: VITE_AZURE_AD_CLIENT_ID, VITE_AZURE_AD_TENANT_ID, VITE_AZURE_AD_BACKEND_CLIENT_ID, VITE_API_BASE";
             exit 1;
           fi
-          # Enforce HTTPS and custom domain usage to avoid accidental azurewebsites.net
-          if [[ "${{ vars.VITE_API_BASE }}" != https://* ]]; then
+          if [[ "${VITE_API_BASE}" != https://* ]]; then
             echo "::error::VITE_API_BASE must start with https://"; exit 1;
           fi
-          if echo "${{ vars.VITE_API_BASE }}" | grep -qi 'azurewebsites\.net'; then
+          if echo "${VITE_API_BASE}" | grep -qi 'azurewebsites\.net'; then
             echo "::error::VITE_API_BASE points to azurewebsites.net. Set it to your custom API domain."; exit 1;
           fi
           cat > .env.production <<EOF
-          VITE_AZURE_AD_CLIENT_ID=${{ vars.VITE_AZURE_AD_CLIENT_ID }}
-          VITE_AZURE_AD_TENANT_ID=${{ vars.VITE_AZURE_AD_TENANT_ID }}
-          VITE_AZURE_AD_BACKEND_CLIENT_ID=${{ vars.VITE_AZURE_AD_BACKEND_CLIENT_ID }}
-          VITE_API_BASE=${{ vars.VITE_API_BASE }}
+          VITE_AZURE_AD_CLIENT_ID=${VITE_AZURE_AD_CLIENT_ID}
+          VITE_AZURE_AD_TENANT_ID=${VITE_AZURE_AD_TENANT_ID}
+          VITE_AZURE_AD_BACKEND_CLIENT_ID=${VITE_AZURE_AD_BACKEND_CLIENT_ID}
+          VITE_API_BASE=${VITE_API_BASE}
           EOF
 
       - name: Build

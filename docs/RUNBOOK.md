@@ -45,6 +45,10 @@ Restore procedure:
 - Rotate API keys (eBay, AusPost) every 90 days
 - Rotate Azure AD secrets regularly
 - Review role assignments quarterly (least privilege principle)
+ - Ensure **Secret Scanning** & **Push Protection** remain enabled (org setting)
+ - Enable **Dependabot alerts & updates** (managed via dependabot.yml) and triage weekly
+ - Consider **CodeQL** scanning if GHAS budget later allocated (C# + JavaScript)
+ - Enforce branch protection / rulesets requiring CI checks before merge
 
 ---
 

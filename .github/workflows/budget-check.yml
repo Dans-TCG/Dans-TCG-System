@@ -1,0 +1,82 @@
+name: budget-check
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 02:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  ORG_NAME: danstcg
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Budget usage probe
+        id: probe
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Apply defaults if vars unset
+          : "${BUDGET_ACTIONS:=25}"
+          : "${BUDGET_CODESPACES:=50}"
+          : "${BUDGET_PACKAGES:=15}"
+          api() { curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com$1" || echo '{}'; }
+          actions=$(api /orgs/$ORG_NAME/settings/billing/actions)
+          codespaces=$(api /orgs/$ORG_NAME/settings/billing/codespaces || echo '{}')
+          packages=$(api /orgs/$ORG_NAME/settings/billing/packages)
+          echo "ACTIONS_JSON=$actions" >> $GITHUB_OUTPUT
+          echo "CODESPACES_JSON=$codespaces" >> $GITHUB_OUTPUT
+          echo "PACKAGES_JSON=$packages" >> $GITHUB_OUTPUT
+          echo "Raw actions: $actions"; echo "Raw codespaces: $codespaces"; echo "Raw packages: $packages"
+
+      - name: Evaluate thresholds & open/update issue
+        uses: actions/github-script@v7
+        env:
+          ACTIONS_JSON: ${{ steps.probe.outputs.ACTIONS_JSON }}
+          CODESPACES_JSON: ${{ steps.probe.outputs.CODESPACES_JSON }}
+          PACKAGES_JSON: ${{ steps.probe.outputs.PACKAGES_JSON }}
+          BUDGET_ACTIONS: ${{ env.BUDGET_ACTIONS }}
+          BUDGET_CODESPACES: ${{ env.BUDGET_CODESPACES }}
+          BUDGET_PACKAGES: ${{ env.BUDGET_PACKAGES }}
+        with:
+          script: |
+            function pct(v,total){ if(!total||total===0) return 0; return (v/total*100).toFixed(1); }
+            const parse = (j)=>{ try{return JSON.parse(j);}catch{return {}; } };
+            const actions = parse(process.env.ACTIONS_JSON);
+            const codespaces = parse(process.env.CODESPACES_JSON);
+            const packages = parse(process.env.PACKAGES_JSON);
+            // These billing endpoints provide usage, not cost; we compare to budgets heuristically.
+            const notes = [];
+            if(actions.total_minutes_used){ notes.push(`Actions minutes used: ${actions.total_minutes_used}`); }
+            if(codespaces.total_hours_used){ notes.push(`Codespaces hours used: ${codespaces.total_hours_used}`); }
+            if(packages.total_gigabytes_bandwidth_used){ notes.push(`Packages bandwidth GB: ${packages.total_gigabytes_bandwidth_used}`); }
+            const body = [
+              '## Budget Check Report',
+              new Date().toISOString(),
+              '',
+              ...notes,
+              '',
+              '> Budgets are monetary; mapping from usage→cost is approximate. Adjust logic once internal rate card is defined.'
+            ].join('\n');
+
+            const {data: issues} = await github.rest.issues.listForRepo({owner: context.repo.owner, repo: context.repo.repo, labels: 'budget-alert', state: 'open'});
+            if(issues.length === 0){
+              await github.rest.issues.create({owner: context.repo.owner, repo: context.repo.repo, title: 'Budget Usage Report', body, labels: ['budget-alert']});
+            } else {
+              await github.rest.issues.update({owner: context.repo.owner, repo: context.repo.repo, issue_number: issues[0].number, body});
+            }
+
+      - name: Ensure label exists
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label='budget-alert';
+            try { await github.rest.issues.getLabel({owner: context.repo.owner, repo: context.repo.repo, name: label}); }
+            catch { await github.rest.issues.createLabel({owner: context.repo.owner, repo: context.repo.repo, name: label, color: 'b60205', description: 'Budget usage tracking'}); }
