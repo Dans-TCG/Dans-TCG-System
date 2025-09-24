@@ -14,8 +14,8 @@ Follow these steps to get started as a new contributor:
 
 ## 2. Clone the Repository
 ```bash
-git clone https://github.com/your-org/dans-tcg-system.git
-cd dans-tcg-system
+git clone https://github.com/danstcg/Dans-TCG-System.git
+cd Dans-TCG-System
 ```
 
 ## 3. Set Up Environment Variables
