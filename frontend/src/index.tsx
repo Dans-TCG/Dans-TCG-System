@@ -22,6 +22,7 @@ const msalInstance = new PublicClientApplication(msalConfig);
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+// No-op change to trigger SWA deploy after token rotation.
 root.render(
   <React.StrictMode>
     <MsalProvider instance={msalInstance}>
