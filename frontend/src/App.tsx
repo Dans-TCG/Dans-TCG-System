@@ -80,6 +80,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 function App() {
+  // Trivial comment to trigger frontend deploy workflow.
   return (
     <Router>
       <Routes>
