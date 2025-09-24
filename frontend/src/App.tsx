@@ -80,7 +80,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 function App() {
-  // Trivial comment to trigger frontend deploy workflow.
+  // No-op change to trigger SWA deploy (token verification run).
   return (
     <Router>
       <Routes>
