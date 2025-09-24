@@ -14,7 +14,8 @@ on:
 
 env:
   APP_LOCATION: frontend
-  OUTPUT_LOCATION: frontend/dist
+  # OUTPUT_LOCATION must be relative to APP_LOCATION for SWA action
+  OUTPUT_LOCATION: dist
 
 permissions:
   contents: read
@@ -92,3 +93,4 @@ jobs:
           output_location: ${{ env.OUTPUT_LOCATION }}
           production_branch: main
           deployment_environment: production
+          skip_app_build: true
