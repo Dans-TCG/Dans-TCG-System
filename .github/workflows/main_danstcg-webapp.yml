@@ -100,8 +100,8 @@ jobs:
           set -e
           HOST="${{ steps.resolve-host.outputs.host }}"
           for i in {1..10}; do
-            if curl -fsS "https://${HOST}/health/db" | grep -q '"db":"ok"'; then
-              echo "Production health ok"; exit 0;
+            if curl -fsS "https://${HOST}/api/health" | grep -q '"status":"Healthy"'; then
+              echo "Production health ok (/api/health)"; exit 0;
             fi
             echo "Prod health not ready yet, retry $i/10..."; sleep 5;
           done

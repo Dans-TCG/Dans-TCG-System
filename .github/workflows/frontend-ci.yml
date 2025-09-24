@@ -39,9 +39,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: Install dependencies
+      - name: Install dependencies (npm ci)
         working-directory: frontend
-        run: npm ci || npm install
+        run: npm ci
 
       - name: Build
         working-directory: frontend
